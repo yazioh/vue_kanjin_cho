@@ -1,0 +1,322 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+ol,
+ul,
+dl {
+    margin: 0;
+    padding: 0;
+}
+
+#wrap {
+    width: 100%;
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 0 15px;
+    height: 100%;
+    overflow: hidden;
+}
+
+#wrap>div.row {
+    height: 100%;
+    min-width: 450px;
+}
+
+#talk .emotions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+#splash .koma {
+    width: 200px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left:-100px;
+    margin-top:-60px;
+
+}
+
+@media screen and ( min-width: 768px) {
+    #wrap>div>* {
+        height: 100%;
+        overflow: hidden;
+    }
+    .koma>p.selif {
+        max-width: 360px;
+        min-width: 64px;
+    }
+    .emotions button {
+        width: 25%;
+        padding: 1px;
+        height: 30px;
+        overflow: hidden;
+    }
+    #talk dl+dl {
+        margin-top: 10px;
+    }
+}
+
+@media screen and ( max-width: 768px) {
+    body {
+        /*  background-color: #999999;*/
+    }
+    #talk {
+        position: absolute;
+        height: 150px;
+        width: 100%;
+        bottom: 0;
+        left: 0;
+    }
+    #frmTalk {
+        display: flex;
+        align-items: flex-start;
+    }
+    #talk .emotions {
+        align-items: flex-start;
+    }
+    #frmTalk>* {
+        flex-grow: 1;
+        width: 45%;
+        padding: 0 1ex;
+    }
+    #frmTalk textarea {
+        height: 5em;
+    }
+    #main {
+        position: absolute;
+        height: auto;
+        bottom: 150px;
+        top: 0;
+        overflow: hidden;
+    }
+    .koma>p.selif {
+        max-width: 280px;
+        min-width: 64px;
+    }
+    #frmTalk .avator {
+        position: absolute;
+        left: 50%;
+        margin-left: -20px;
+    }
+    .emotions button {
+        width: 50%;
+        height: 40px;
+        padding: 1px;
+        overflow: hidden;
+    }
+    .avaname {
+        height: 20px
+    }
+}
+
+#wrap>div div.screen {
+    height: 100%;
+    position: relative;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+#main>h1 {
+    margin-top: 0;
+    border-bottom: solid 1px #999;
+}
+
+.page>ol>li {
+    list-style: none;
+}
+
+.page {
+    padding: 30px 15px;
+    border: solid 1px #ccc;
+    box-shadow: 2px 2px 2px #666;
+    min-height: 80%;
+    margin-bottom: 20px;
+}
+
+.timeline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.koma {
+    min-height: 120px;
+    min-width: 15%;
+    border: solid 1px #ccc;
+    word-break: break-all;
+    position: relative;
+    margin: 8px 2px;
+    background-color: #ccc;
+}
+
+.koma>p.selif {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 0 0 1em 1em;
+    padding: 1ex 1ex 1em;
+    z-index: 100;
+    position: relative;
+    word-break: break-all;
+    margin: 0 auto 40px;
+}
+
+p.selif:after {
+    position: absolute;
+    bottom: -10px;
+    content: "";
+    border-left: solid 8px rgba(255, 255, 255, 0.7);
+    border-top: 0;
+    border-bottom: solid 10px transparent;
+    z-index: -1;
+    left: 40px;
+}
+
+.narrow p.selif:after {
+    border-radius: 0 0 0 64px / 0 0 0 10px;
+    left: 12px;
+}
+
+.koma figure {
+    position: absolute;
+    bottom: 0;
+    min-width: 48px;
+    min-height: 64px;
+    z-index: -1;
+}
+
+.koma figure>div {
+    width: 48px;
+    height: 64px;
+    background-size: cover;
+    background-position: right top;
+}
+
+.koma .repry figure {
+    right: 0;
+}
+
+.koma i {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    text-align: right;
+    display: none;
+}
+
+.koma:hover i {
+    display: block;
+}
+
+.koma testarea {
+    padding: 0.5ex;
+    line-height: 1.5em;
+    font-size: 16px;
+    height: 4.5em;
+}
+
+#p2 {
+    display: none;
+}
+
+textarea.fit {
+    width: calc(100%);
+    margin: 0;
+}
+
+.avator {
+    width: 48px;
+    height: 64px;
+    position: relative;
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.x2.avator {
+    width: 96px;
+    height: 128px;
+}
+
+.avator>span {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-position: bottom center;
+    background-repeat: no-repeat;
+}
+
+.x2.avator>span {
+    background-size: 96px 128px;
+    image-rendering: pixelated;
+}
+
+.changes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.changes li {
+    width: 80px;
+    overflow: hidden;
+    /*    flex-grow: 1;*/
+    list-style: none;
+    text-align: center;
+    padding: 8px;
+    margin: 4px;
+    border: solid 1px #ccc;
+}
+
+.koma>.avator {
+    position: absolute;
+    bottom: 0;
+}
+
+.koma.w0 {
+    flex-grow: 1;
+}
+
+.koma.w1 {
+    flex-grow: 2;
+}
+
+.koma.w2 {
+    flex-grow: 3;
+}
+
+.koma.w4 {
+    flex-grow: 6;
+}
+
+.btnSendMessage {
+    position: absolute;
+    bottom: 0;
+    right: 1ex;
+    border-radius: 50%;
+}
+
+.btnConfig {
+    float: right;
+    /*position:absolute;*/
+    right: 15px;
+    bottom: 5px;
+}
+
+#frmTalk {
+    position: absolute;
+    bottom: 1em;
+    left: 0;
+}
+
+.avaname {
+    word-break: break-all;
+    height: 30px;
+    overflow: hidden;
+}

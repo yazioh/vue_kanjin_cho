@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>きゃらと - 閑人帳</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/kzc.css">
+</head>
+
+<body class="no-thank-yu">
+    <div id="appBody">
+        <div id="splash" v-if="showFlg">
+
+            <div class="koma">
+                <p class="selif"> 
+                    <img src="img/spin_s.gif" alt="loading">
+                    <span>なうろ～でぃん </span>
+                </p>
+                <span class="avator" v-html="staff"></span>
+            </div>
+
+        </div>
+        <div id="wrap">
+
+            <div class="row">
+                <!--nav id="menu" class="col-md-3 hidden-sm hidden-xs">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        mnu
+                    </div>
+                    <dl class="profile panel-body">
+                        <dt>name</dt>
+                        <dd>(未設定)</dd>
+                        <dt>avator</dt>
+                        <dd>(未設定)</dd>
+                        <dt>room</dt>
+                        <dd>(未設定)</dd>
+                    </dl>
+                </div>
+            </nav-->
+
+
+                <!-- talk UI -->
+                <fieldset id="talk" v-if="showFlg"  class="col-md-3 col-sm-4">
+                    <div class="screen">
+
+                        <form id="frmTalk">
+                            <dl>
+                                <dt class="hidden-sm hidden-xs">
+                                    <span>talk</span>
+                                </dt>
+                                <dd style="position: relative;">
+                                    <textarea v-model="msg" name="talk" id="txtTalk" class="fit" cols="30" rows="5" style="margin:0; border-radius: 8px;"></textarea>
+
+                                    <button class="btnSendMessage" type="button" @click="sendMessage">
+                                        <i class="glyphicon glyphicon-send"></i>
+                                    </button>
+                                </dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="col-xs-3 text-center">
+                                    <cmp-avator :face="ava.face">NoImaege</cmp-avator>
+                                </dt>
+                                <dd class="col-xs-9 " style="min-height:64px;">
+                                    <div class="emotions">
+                                        <button class="" type="button" @click="tgleLaugh">^◡^</button>
+                                        <button class="" type="button" @click="tglAnger">`^´</button>
+                                        <button class="" type="button" @click="tglCry">ToT</button>
+                                        <button class="" type="button" @click="tglEtc">╹-╹</button>
+                                    </div>
+                                </dd>
+
+                                <dt class="avaname hidden-xs col-sm-3 text-center">name </dt>
+                                <dd class="avaname col-sm-9">
+                                    <button class="btnConfig" type="button" @click="openEdit">
+                                        <i class="glyphicon glyphicon-cog"></i>
+                                    </button>
+                                    {{ ava.name }}
+                                </dd>
+
+                            </dl>
+
+                        </form>
+                        <div id="mdlEdit" class="modal fade">
+                            <div class="modal-dialog modal-content">
+                                <div class="modal-header">
+                                    <i class="glyphicon glyphicon-cog"></i>
+                                    プロフィールの変更
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                        <i class="glyphicon glyphicon-remove"></i>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+
+                                    <div class="media">
+                                        <dt class="media-left">
+                                            <cmp-avator :face="edit.face" class="x2">NoImaege</cmp-avator>
+                                        </dt>
+                                        <dd class="media-body">
+
+                                            <div class="form-horizontal">
+                                                <dl class="form-group">
+                                                    <dt class="col-sm-3 control-label">名前</dt>
+                                                    <dd class="col-sm-9">
+                                                        <input type="text" class="form-contral" v-model="edit.name">
+                                                    </dd>
+                                                </dl>
+                                                <dl class="form-group">
+
+                                                    <dt class="col-sm-3 control-label">性別変更</dt>
+                                                    <dd class="col-sm-9">
+                                                        <div class="btn-group" role="group">
+                                                            <button class="btn btn-default" @click="onChangeGender('M')">男性</button>
+                                                            <button class="btn btn-default" @click="onChangeGender('F')">女性</button>
+                                                        </div>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                            <p class="note text-info">
+                                                <i class="glyphicon glyphicon-exclamation-sign"></i>
+                                                性別を変更すると、容姿の選択がリセットされます</p>
+                                        </dd>
+                                    </div>
+
+                                    <h4>容姿選択</h4>
+                                    <div class="selectPart btn-group" role="group">
+                                        <button class="btn btn-default" @click="onChangePart('hairColor')">髪色</button>
+                                        <button class="btn btn-default" @click="onChangePart('hairBack')">後髪</button>
+                                        <button class="btn btn-default" @click="onChangePart('hairFront')">前髪</button>
+                                        <button class="btn btn-default" @click="onChangePart('hairExtend')">装飾</button>
+                                    </div>
+                                    |
+                                    <div class="selectPart btn-group" role="group">
+                                        <button class="btn btn-default" @click="onChangePart('baseColor')">肌色</button>
+                                        <button class="btn btn-default" @click="onChangePart('eyeColor')">目色</button>
+                                        <button class="btn btn-default" @click="onChangePart('eyeType')">目形</button>
+                                        <button class="btn btn-default" @click="onChangePart('faceAcc')">装飾</button -->
+                                    </div>
+                                    |
+                                    <button class="btn btn-default" @click="onChangePart('cloth')">服</button>
+
+                                    <div class="scroll">
+                                        <ul class="changes">
+                                            <li v-for="avator in previews" 　@click="onChangeItem(avator.name)">
+                                                <cmp-avator :face="avator.face" :size=1>NoImaege</cmp-avator>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button class="btn btn-default" @click="onAttach">
+                                            <i class="glyphicon glyphicon-ok"></i>変更する</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </fieldset>
+
+                <!-- time line -->
+                <div id="main" v-if="showFlg" class="col-md-9 col-sm-8">
+                                           
+                    <div class="screen">
+                        <h1 id="room" class="mt0" v-bind:class="status">{{ roomName }}</h1>
+
+                        <div class="page">
+                            <ol class="timeline">
+                                <cmp-koma v-for="talk in log" :talk="talk" :key="talk.id"></cmp-koma>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- deploy -->
+    <script src="js/v/vue.min.js"></script>
+
+    <!-- develop -->
+    <!--script src="js/v/vue.js"></script-->
+
+    <script src="js/v/jquery-3.3.1.min.js"></script>
+    <script src="js/v/bootstrap.min.js"></script>
+    <script src="js/v/store.legacy.min.js"></script>
+    <script type="text/javascript" src="js/db.js"></script>
+    <script type="text/javascript" src="js/avator.js"></script>
+    <script type="text/javascript" src="js/api.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+    <script>
+        var KZC = '';
+        $(function () {
+            console.log("jQuery startup");
+            // APP起動
+            KZC = new APP();
+        });
+    </script>
+</body>
+
+</html>
