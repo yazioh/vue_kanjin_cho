@@ -5,33 +5,33 @@
  */
 class APP {
     /**
-     * アプリケーション初期化
+     * サブ/Util初期化
      */
     constructor() {
-        console.log("app booting ...");
-        this.splashView();
+        console.log("constluctor ...");
         //------------
-        // init utility
         this._DB = new DB(this);
         this._API = new API(this);
-        this._AvaCache = new avaCache(this, this._DB);
+    }
 
-        //------------
+    /**
+     * アプリケーション初期化
+     */
+    boot() {
+        console.log("app booting ...");
+        this.splashView();
 
         API.getAuth(this._DB.loadBrkey(), this._DB.loadToken()).
         then(function (res) {
+
             if (res && res.status) {
                 if (res.status == 'x') {
                     KZC._DB.saveBrkey(res.brkey);
                 }
                 KZC._DB.saveToken(res.token);
                 KZC._checkChid().then(function () {
-                    $('#splash .koma')
-                        .animate({
-                            opacity: 0
-                        }, 1000, function () {
-                            KZC.start();
-                        })
+                    KZC.start();
+
                 }, KZC.terminate);
             }
         }, API.commonError);
@@ -71,20 +71,35 @@ class APP {
         this.vMain.loadRoom(this._DB.load("last_room"));
         this.vMain.loadLog(this._DB.load("logs"));
         let chid = this._DB.load("player_id");
-        this.vTalk.loadPlayer(chid, this._AvaCache);
+        this.vTalk.loadPlayer(chid, this._DB.avator());
 
-        //表示切り替え
-        this.vApp.showFlg = 0;
-        this.vMain.showFlg = 1;
-        this.vTalk.showFlg = 1;
+        $('#splash .koma').animate({
+            opacity: 0
+        }, 2000, () => {
 
-        // ポーリング開始
-        API.setNext();
-        console.log("*** welcome to きゃらと ***");
+            //表示切り替え
+            this.vApp.showFlg = 0;
+            this.vMain.showFlg = 1;
+            this.vTalk.showFlg = 1;
+
+            // ポーリング開始
+            API.setNext();
+            console.log("*** welcome to きゃらと ***");
+        });
     }
 
+    /**
+     * public
+     * ローカルのアバターDBにアクセス
+     */
     avaCache() {
-        return this._AvaCache;
+        return this._DB.avator();
+    }
+    /**
+     * public
+     */
+    db() {
+        return this._DB;
     }
 
     splashView() {
@@ -102,8 +117,8 @@ class APP {
             },
             computed: {
                 staff: function () {
-                    let _staffAva = new Avator();
-                    _staffAva.setHairColor("lbrwn").setHairBack("back_05.gif").setHairFront("front_00.gif").setCloth("lobby.gif")
+                    console.log(KZC);
+                    let _staffAva = new Avator(KZC.db().load("staff"));
                     return _staffAva.toHtml();
                 }
 
@@ -183,7 +198,7 @@ class APP {
                 showFlg: 0,
                 msg: "",
                 chid: "",
-                AvaCache: this._AvaCache,
+                AvaCache: this.avaCache(),
                 ava: {
                     name: "--",
                     face: Avator.getDefault("F")
@@ -307,7 +322,7 @@ class APP {
                         alert("初期化error");
                         return;
                     }
-                    this.edit = new Avator( Avator.getCache(this.chid));
+                    this.edit = new Avator(Avator.getCache(this.chid));
 
                     // 選択肢初期化
                     this.changePart = 'hairColor';
@@ -509,3 +524,21 @@ Vue.component(
             }
         }
     });
+
+/**
+ * ユーザーメッセージのフォーマット
+ * @param {*} strID 
+ * @param {*} txtMessage 
+ * @param {*} jsonEmotion 
+ * @param {*} time 
+ */
+function msg(strID, txtMessage, jsonEmotion, time) {
+    let _time = (time ? new Date(time) : new Date());
+    return {
+        id: id++,
+        chid: strID,
+        emotion: jsonEmotion,
+        talk: txtMessage,
+        rgst: _time,
+    };
+}

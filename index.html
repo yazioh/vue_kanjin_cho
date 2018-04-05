@@ -193,11 +193,12 @@
     <script type="text/javascript" src="js/api.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
     <script>
-        var KZC = '';
+        var KZC = {};
         $(function () {
             console.log("jQuery startup");
             // APP起動
             KZC = new APP();
+            KZC.boot();
         });
     </script>
 </body>
