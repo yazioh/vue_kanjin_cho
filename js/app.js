@@ -11,7 +11,7 @@ class APP {
         console.log("constluctor ...");
         //------------
         this._DB = new DB(this);
-        this._API = new API(this);
+        this._API = new API();
     }
 
     /**
@@ -22,7 +22,7 @@ class APP {
         this.splashView();
 
         API.getAuth(this._DB.loadBrkey(), this._DB.loadToken()).
-        then(function (res) {
+        then((res) => {
 
             if (res && res.status) {
                 if (res.status == 'x') {
@@ -31,10 +31,18 @@ class APP {
                 KZC._DB.saveToken(res.token);
                 KZC._checkChid().then(function () {
                     KZC.start();
-
-                }, KZC.terminate);
+                }, KZC.nodataStart);
             }
         }, API.commonError);
+    }
+    /**
+     * 
+     */
+    nodataStart (){
+        // ここでチュートリアルログを生成
+
+        // アバターの生成画面へ
+        console.log("stoped !!!!");
     }
 
     /**
@@ -64,6 +72,30 @@ class APP {
         }
     }
 
+    _refreshAvator() {
+        console.log("refresh");
+        let _chr = this.db().load("avator_cache");
+        if (!_chr) {
+            // 新規のときか、LDBクリアしたあと
+
+            return;
+        }
+
+        // 既存データは起動時に確認　→TODO あとでまとめて
+        for (var chid in _chr) {
+            if (chid == "staff") {
+                this.avaCache().update("staff", this.db().load("staff"));
+
+            } else {
+                API.getAvator(chid).then((res) => {
+                    if (res.status && res.status == 'o') {
+                        this.avaCache().update(res.data.chid, res.data);
+                    }
+                });
+            }
+        }
+    }
+
     /**
      * ローカルDBからログを取得、ページ初期化
      */
@@ -72,7 +104,8 @@ class APP {
         this.vMain.loadLog(this._DB.load("logs"));
         let chid = this._DB.load("player_id");
         this.vTalk.loadPlayer(chid, this._DB.avator());
-
+        
+        //TODO css
         $('#splash .koma').animate({
             opacity: 0
         }, 2000, () => {
@@ -83,7 +116,9 @@ class APP {
             this.vTalk.showFlg = 1;
 
             // ポーリング開始
-            API.setNext();
+            this.api().startTimer((res) => {
+                this.onReceveMessage(res);
+            }, 1000);
             console.log("*** welcome to きゃらと ***");
         });
     }
@@ -102,6 +137,10 @@ class APP {
         return this._DB;
     }
 
+    api() {
+        return this._API;
+    }
+
     splashView() {
         this.initView();
         this.vApp.showFlg = 1;
@@ -110,6 +149,10 @@ class APP {
     }
 
     initView() {
+        /**
+         * 最上位(表示コントロール用)
+         * 
+         */
         this.vApp = new Vue({
             "el": "#splash",
             "data": {
@@ -117,11 +160,9 @@ class APP {
             },
             computed: {
                 staff: function () {
-                    console.log(KZC);
                     let _staffAva = new Avator(KZC.db().load("staff"));
                     return _staffAva.toHtml();
                 }
-
             },
             methods: {
 
@@ -138,8 +179,12 @@ class APP {
                 "roomID": "",
                 "status": "",
                 "roomName": "",
+                "lastId": 0,
                 "log": [],
-                "member": []
+                "member": [],
+
+                "que": [],
+                "timer": null,
             },
             "computed": {
                 //
@@ -155,26 +200,20 @@ class APP {
                 // local storage からログを復元
                 // こっちは一括表示
                 loadLog: function (list) {
-                    if (typeof list == undefined) {
+                    if (typeof list == "undefined") {
                         this.log = [];
                         return;
                     }
-                    let _unKnown = [];
-                    list.forEach(msg => {
-                        if (!KZC.avaCache().exists(msg.chid)) {
-                            _unKnown.push(msg.chid);
-                        }
-                    });
+                    if(list.length >80){
+                        list = list.slice(-40);
+                    }
+                    let _unKnown = KZC.db().findNewFace(list);
                     if (_unKnown.length > 0) {
-                        _unKnown = _unKnown.filter(function (x, i, self) {
-                            return self.indexOf(x) === i;
-                        });
-                        console.log(_unKnown);
-                        _unKnown.forEach(chid => {
-                            KZC.requestAvator(chid);
+                        _unKnown.forEach((tk) => {
+                            KZC.requestAvator(tk.chid);
                         });
                     }
-                    this.log = list;
+                    this.setQue(list);
                 },
 
                 // TODO ここを起点にコマの挿入アニメーションへ
@@ -186,6 +225,45 @@ class APP {
                     }
                     this.log.push(msg);
                 },
+
+                setQue(diff) {
+                    if (diff && diff.length > 0) {
+                        clearTimeout(this.timer);
+                        this.que = diff;
+                        return this.deQue();
+                    }
+                },
+
+                deQue() {
+                    clearTimeout(this.timer);
+                    if (this.que.length > 0) {
+                        let msg = this.que.shift();
+                        this.lastId = msg.id;
+                        this.log.push(msg);
+                        var $scr = $("#main .screen").eq(0);
+                        var ch = $("ol", $scr).eq(0).height();
+                        // append のイベントへ移動
+                        setTimeout(() => {
+                            let c2 = $("ol", $scr).eq(0).height();
+                            if (c2 > ch) {
+                                $scr.scrollTop(c2);
+                            }
+                        }, 100);
+                    }
+
+                    if (this.que.length > 0) {
+                        let tmm = (this.que.length > 10) ? 300 : 500;
+                        this.timer = setTimeout(() => {
+                            this.deQue();
+                        }, tmm);
+
+                    } else {
+                        if (this.log.length > 80) {
+                            this.log = this.log.slice(-40);
+                        }
+                    }
+                }
+
             }
         });
 
@@ -227,7 +305,7 @@ class APP {
                     this.chid = chid;
                     this.ava.name = Cache.name(chid);
                     //this.ava.face = Cache.face(chid);
-                    $.extend(this.ava.face.gender, Cache.face(chid).gender);
+                    this.ava.face.gender = '' + Cache.face(chid).gender;
                     $.extend(this.ava.face.base, Cache.face(chid).base);
                     $.extend(this.ava.face.eye, Cache.face(chid).eye);
                     $.extend(this.ava.face.hair, Cache.face(chid).hair);
@@ -254,19 +332,19 @@ class APP {
                  * 表情変更ボタンイベントハンドラ
                  */
                 tgleLaugh: function () {
-                    let items = Avator.emotionItems("laugh");
+                    let items = Avator.emotionItems("laugh", this.ava.gender);
                     this.ava.face.emo.eye = this._toggle(items, this.ava.face.emo.eye);
                 },
                 tglAnger: function () {
-                    let items = Avator.emotionItems("anger");
+                    let items = Avator.emotionItems("anger", this.ava.gender);
                     this.ava.face.emo.eye = this._toggle(items, this.ava.face.emo.eye);
                 },
                 tglCry: function () {
-                    let items = Avator.emotionItems("cry");
+                    let items = Avator.emotionItems("cry", this.ava.gender);
                     this.ava.face.emo.eye = this._toggle(items, this.ava.face.emo.eye);
                 },
                 tglEtc: function () {
-                    let items = Avator.emotionItems("etc");
+                    let items = Avator.emotionItems("etc", this.ava.gender);
                     this.ava.face.emo.eye = this._toggle(items, this.ava.face.emo.eye);
                 },
                 // TODO 汗とかエモアイコン追加
@@ -280,14 +358,17 @@ class APP {
                         console.log("send cancel");
                         return false;
                     }
-                    let send = msg(
+
+                    let send = KZC.db().msg(
                         this.chid,
                         this.msg,
                         Vue.util.extend({}, this.ava.face.emo)
                     );
                     // 実際に何やるかはAPP本体さんにお任せ
-                    KZC.sendMessage(send, this.clear, API.commonError);
+                    KZC.onSendMessage(send, this.clear);
                 },
+
+
                 /**
                  * 送信前バリデーション
                  */
@@ -308,6 +389,11 @@ class APP {
                     this.ava.face.emo.eye = '';
                     this.ava.face.emo.over = '';
                     this.ava.face.emo.vol = '';
+
+                    let t = this.$refs.textArea;
+                    if (t) {
+                        t.focus();
+                    }
                 },
                 alertAccessError: function (res) {
                     alert("通信に失敗　しばしまて");
@@ -376,7 +462,9 @@ class APP {
                     $('body').removeClass('modal-open');
                     $('.modal-backdrop').remove();
                     $('#mdlEdit').modal('hide');
-                }
+                },
+
+
             }
         });
     }
@@ -402,64 +490,76 @@ class APP {
      * @param function onSuccess 
      * @param function onFalure 
      */
-    sendMessage(data, onSuccess, onFalure) {
-        API.setTalk(data).then(
-            function (res) {
+    onSendMessage(data, onSuccess, onFalure) {
+
+        this.api().setTalk(data).then(
+            (res) => {
+                // view 側のあと始末
                 onSuccess();
+
                 if (res.tkid) {
-                    API.getTalk(res.tkid + 2).then(
-                        function (res) {
-                            if (res.talk) {
-                                KZC._DB.saveLog(res.talk)
-                                KZC.vMain.loadLog(KZC._DB.load("logs"));
-                            }
-                            if (res.msg) {
-                                alert(msg)
-                            }
-                            API.setNext();
-                        }
-                    );
+                    this.api().getTalk(res.tkid).then(
+                        (res) => {
+                            this.onReceveMessage(res);
+                        },
+                        API.commonError);
                 }
             },
+            // view 側に失敗を通知
             onFalure
         );
     }
 
-    getMessage() {
-        API.getTalk().then(
-            function (res) {
-                if (res.talk) {
-                    KZC._DB.saveLog(res.talk)
-                    KZC.vMain.loadLog(KZC._DB.load("logs"));
-                }
-                if (res.msg) {
-                    alert(msg)
-                }
-                API.setNext();
+    /**
+     * APIから 発言を受け取ったとき
+     */
+    onReceveMessage(res) {
+        if (res.talk) {
+            this.db().saveLog(res.talk);
+
+            let q = this.db().makeQue(this.vMain.lastId);
+            if (q.length > 0) {
+                this.vMain.setQue(q);
             }
-        );
+            if (res.updates && res.updates.length) {
+                res.updates.forEach((a) => {
+                    if (a.chid) {
+                        let chid = a.chid
+                        this.avaCache().update(chid, a);
+                    }
+                });
+            }
+        }
+        if (res.msg) {
+            alert(msg)
+        }
+        this.api().startTimer((res) => {
+            this.onReceveMessage(res);
+        });
     }
 
+    /**
+     * 
+     * @param {*} chid
+     * @return promise 
+     */
     requestAvator(chid) {
         return API.getAvator(chid).then(
             function (res) {
                 if (!res) {
                     return API.commonError("?");
                 }
-                if (res.status && res.status == 'o') {
-                    console.log(res);
-                    let _ava = new Avator({
-                        name: res.data.name,
-                        face: res.data.face
-                    });
-                    //console.log(_ava);
-                    KZC.updatePlayer(chid, _ava);
-                }
                 if (res.msg) {
+                    // なんかエラー帰っとるにゃ？
                     alert(res.msg);
                 }
-            }, API.commonError
-        );
+                if (res.status && res.status == 'o') {
+                    let _ava = new Avator(res.data);
+                    KZC.updatePlayer(chid, _ava);
+                }
+            },
+            API.commonError
+        ).promise();
     }
 };
 
@@ -469,10 +569,10 @@ Vue.component(
         props: ["talk"],
         // TODO 背景色 大声（x2）など
         template: '<li class="koma" :class="komaSize">' +
-            '<p v-if="talk.talk" class="selif">{{ talk.talk }}</p>' +
+            '<p v-if="talk.talk" class="selif" v-html="TalkNl2Br"></p>' +
             '<span v-html="avator(talk.chid, talk.emotion)" class="avator"></span>' +
             '<i class="time">{{ fzTime }}</i>' +
-            '<b class="name">{{ talk.avaName }}</b>' +
+            '<b class="name">{{ avaName }}</b>' +
             '</li>',
         methods: {
             avator: function (chid, emotion) {
@@ -480,10 +580,17 @@ Vue.component(
             }
         },
         computed: {
+            TalkNl2Br:function(){
+                let tmp = this.talk.talk.split("\n");
+                return tmp.join('<br>'); 
+            },
             fzTime: function () {
                 return '';
                 // return "00:00";
                 // return this.talk.time + "fz";
+            },
+            avaName: function () {
+                return Avator.getName(this.talk.chid);
             },
 
             komaSize: function () {
@@ -524,21 +631,3 @@ Vue.component(
             }
         }
     });
-
-/**
- * ユーザーメッセージのフォーマット
- * @param {*} strID 
- * @param {*} txtMessage 
- * @param {*} jsonEmotion 
- * @param {*} time 
- */
-function msg(strID, txtMessage, jsonEmotion, time) {
-    let _time = (time ? new Date(time) : new Date());
-    return {
-        id: id++,
-        chid: strID,
-        emotion: jsonEmotion,
-        talk: txtMessage,
-        rgst: _time,
-    };
-}

@@ -23,7 +23,6 @@ class apiAvator extends apiBase
     public function get($req)
     {
         try {
-
             if (!empty($req['chid'])) {
                 $row = $this->find($this->table, "chid", $req['chid']);
             }
@@ -31,6 +30,8 @@ class apiAvator extends apiBase
                 throw new Exception("該当なし");
             }
 
+            // あとで更新判定に使う
+            $this->setAvaCache($row);
             $this->showJson(array(
                 "status" => 'o',
                 "data" => array(
@@ -94,7 +95,9 @@ class apiAvator extends apiBase
         }
     }
 
-
+    /**
+     * 初期化
+     */
     public function getChid($req)
     {
         try {

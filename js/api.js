@@ -1,4 +1,9 @@
 class API {
+
+    constructor() {
+        this.timer = null;
+    }
+
     static apiUrl(apiName) {
         //todo 
         return "./api/" + apiName + ".php";
@@ -6,6 +11,7 @@ class API {
     static commonError(err) {
         alert("通信状態がよくありません\n" +
             "しばらくたってからアクセスしてみてください\n(" + err + ")");
+        console.log(err);
     }
     /**
      * 
@@ -61,25 +67,10 @@ class API {
      * @param {*} data 
      * @param {*} upAvator 
      */
-    static setTalk(data) {
+    setTalk(data) {
         data.cmd = "set";
         return $.ajax({
-            url: this.apiUrl("talk"),
-            data: data,
-            type: "post",
-            dataType: "json"
-        });
-    }
-
-    static getTalk(tkid) {
-        let data = {
-            'cmd': "get",
-        };
-        if (tkid) {
-            data.tkid = tkid;
-        }
-        return $.ajax({
-            url: this.apiUrl("talk"),
+            url: API.apiUrl("talk"),
             data: data,
             type: "post",
             dataType: "json"
@@ -87,12 +78,24 @@ class API {
     }
 
     /**
-     * 
-     * @param {*} app 
+     * チャット取得
+     * @param {*} tkid 
      */
-    constructor(app) {
-        this._app = app;
+    getTalk(tkid) {
+        let data = {
+            'cmd': "get",
+        };
+        if (tkid) {
+            data.tkid = tkid;
+        }
+        return $.ajax({
+            url: API.apiUrl("talk"),
+            data: data,
+            type: "post",
+            dataType: "json"
+        });
     }
+
     // test
     static get(url, okTask, errorTask) {
         var request = new XMLHttpRequest();
@@ -120,13 +123,17 @@ class API {
         request.send(null);
     }
 
-    static setNext() {
+    
+    stopTtimer(){
         clearTimeout(this.timer);
-        this.timer = setTimeout(function () {
-            console.log("* pole ")
-            KZC.getMessage();
-        }, 10000);
     }
 
+    startTimer(callback, wait=3000) {
+        this.stopTtimer();
+        this.timer = setTimeout(()=> {
+            //  引数なし＝最新のみ取得
+            this.getTalk().then(callback, this.commonError);
+        }, wait);
+    }
+    
 }
-API.timer = null;

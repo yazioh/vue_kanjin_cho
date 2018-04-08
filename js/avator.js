@@ -150,6 +150,7 @@ class Avator {
         return "img/av/" + 　img;
     }
     static urlEye(face) {
+        
         let img = "eye/" + ((face.emo.eye) ? 'sp/' + face.gender + "/" + face.emo.eye : face.eye.color + '/' + face.eye.type);
         return "img/av/" + img;
     }
@@ -222,10 +223,10 @@ class Avator {
             (urlFace ? `<span class="base"   style="background-image:url(${urlFace} )"></span>` : '') +
             (urlHairB ? `<span class="hairB" style="background-image:url(${urlHairB})"></span>` : '') +
             (urlCloth ? `<span class="cloth" style="background-image:url(${urlCloth})"></span>` : '') +
+            (urlFaceA ? `<span class="eye"   style="background-image:url(${urlFaceA})"></span>` : '') +
             (urlEye ? `<span class="eye  "   style="background-image:url(${urlEye}  )"></span>` : '') +
             (urlHairA ? `<span class="hairA" style="background-image:url(${urlHairA})"></span>` : '') +
             (urlHairF ? `<span class="hairF" style="background-image:url(${urlHairF})"></span>` : '') +
-            (urlFaceA ? `<span class="eye"   style="background-image:url(${urlFaceA})"></span>` : '') +
             (urlEmoFr ? `<span class="emo"   style="background-image:url(${urlEmoFr})"></span>` : '');
         return vw;
     }
@@ -243,6 +244,14 @@ class Avator {
             return this.build(_ava.face);
         }
     }
+    
+    static getName(chid) {
+        if (!this.cacheExists(chid)) {
+            return '--';
+        }
+        let _ava = this.getCache(chid);
+        return _ava.name;         
+    }
 
     /**
      * アバターDB
@@ -256,7 +265,6 @@ class Avator {
         }
         // 男女共用
         if (typeof parts.G !== "undefined") {
-            console.log(parts["G"]);
             return parts.G;
         }
         return [];
@@ -273,8 +281,8 @@ class Avator {
     /**
      * @param {*} partName 
      */
-    static emotionItems(partName) {
-        return DB.emotionItems(partName);
+    static emotionItems(partName, gender) {
+        return DB.emotionItems(partName, gender);
     }
 
     /**

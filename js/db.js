@@ -20,6 +20,10 @@ class DB {
     avator() {
         return this._avatorCache;
     }
+    avaCache() {
+        return this._avatorCache;
+    }
+
 
     saveBrkey(str) {
         store.set("brkey", str);
@@ -45,7 +49,6 @@ class DB {
     }
 
     /**
-     * TODO  キューイング
      * @param {*} addList 
      */
     saveLog(addList) {
@@ -70,10 +73,46 @@ class DB {
             }
         });
         list.sort(function (a, b) {
-            return (a.id > b.id) ? 1 : -1;
+            return (Number(a.id) > Number(b.id) ? 1 : -1);
         });
 
         store.set("talk_log", list);
+    }
+
+    /**
+     * 
+     * @param {*} lastID 
+     * @return array
+     */
+    makeQue(lastID) {
+        let logs = this.load("logs");
+        if (typeof logs == 'undefined') {
+            return [];
+        }
+        return logs.filter((msg) => {
+            return (Number(msg.id) > Number(lastID));
+        });
+    }
+
+    /**
+     * 新着アバターの検出
+     * @param {*} log ログまたはキュー
+     */
+    findNewFace(log) {
+        var chids = {};
+        let newCommer = log.filter((tk) => {
+            if (typeof chids[tk.chid] != 'undefined') {
+                return false;
+            }
+            chids[tk.chid] = 1;
+            if(this.avator().exists(tk.chid)){
+                return false;
+            }
+            chids[tk.chid] = 0;
+            return true;
+        });
+        // Talk 全体が帰るけど 取得先でchid拾ってね
+        return newCommer;
     }
 
     /**
@@ -113,9 +152,12 @@ class DB {
                 //store.remove("talk_log");
                 let logs = store.get("talk_log");
                 if (typeof logs !== 'undefined') {
+                    logs.sort(function (a, b) {
+                        return (Number(a.id) > Number(b.id) ? 1 : -1);
+                    });
+                    store.set("talk_log", logs);
                     return logs;
                 } else {
-
                     let t = [];
                     this.saveLog(t);
                     return t;
@@ -165,9 +207,9 @@ class DB {
             case 'hairColor':
                 return {
                     G: ["blk", "dbrwn", "org", "red", "pink", "viol", "grn", "lgrn", "gold", "silv", "lvio", "blue"]
-                }; //, "lbrwn"
+                }; //, "lbrwn" 今の所staff専用
 
-                // 性差あり
+                // 性差ありの部品
             case 'base':
                 return {
                     F: ["base_00.gif", "base_00c.gif", "base_01.gif", "base_01c.gif", "base_02.gif", "base_02c.gif"],
@@ -220,7 +262,6 @@ class DB {
                     G: []
                 };
         }
-
     }
 
     static emotionItems(partName) {
@@ -303,7 +344,23 @@ class DB {
         }
     }
 
-
+    /**
+     * ユーザーメッセージのフォーマット
+     * @param {*} strID 
+     * @param {*} txtMessage 
+     * @param {*} jsonEmotion 
+     * @param {*} time 
+     */
+    msg(strID, txtMessage, jsonEmotion, time) {
+        let _time = (time ? new Date(time) : new Date());
+        return {
+            id: id++,
+            chid: strID,
+            emotion: jsonEmotion,
+            talk: txtMessage,
+            rgst: _time,
+        };
+    }
 }
 
 /**
@@ -323,7 +380,7 @@ class avaCache {
             this.append(chid, upAva);
         } else {
             console.log("avator " + chid + " modefied");
-            this.cache[chid] = upAva.toJson();
+            this.cache[chid] = upAva;
         }
         store.set("avator_cache", this.cache);
         // DB.saveAvaCache(this.cache);
@@ -356,7 +413,7 @@ class avaCache {
         if (!this.exists(chid)) {
             return false;
         }
-        // 返した先でオリジナルが更新されてしまわないように
+        // 返した先でオリジナルを汚染しないように参照を切断
         return JSON.parse(JSON.stringify(this.cache[chid]));
     }
 }

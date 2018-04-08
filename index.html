@@ -10,21 +10,19 @@
     <link rel="stylesheet" href="css/kzc.css">
 </head>
 
-<body class="no-thank-yu">
+<body class_="no-thank-yu">
     <div id="appBody">
         <div id="splash" v-if="showFlg">
-
             <div class="koma">
-                <p class="selif"> 
+                <p class="selif">
                     <img src="img/spin_s.gif" alt="loading">
                     <span>なうろ～でぃん </span>
                 </p>
                 <span class="avator" v-html="staff"></span>
             </div>
-
         </div>
-        <div id="wrap">
 
+        <div id="wrap">
             <div class="row">
                 <!--nav id="menu" class="col-md-3 hidden-sm hidden-xs">
                 <div class="panel panel-primary">
@@ -41,19 +39,16 @@
                     </dl>
                 </div>
             </nav-->
-
-
                 <!-- talk UI -->
-                <fieldset id="talk" v-if="showFlg"  class="col-md-3 col-sm-4">
+                <div id="talk" v-if="showFlg" class="col-md-3 col-sm-4">
                     <div class="screen">
-
                         <form id="frmTalk">
                             <dl>
                                 <dt class="hidden-sm hidden-xs">
                                     <span>talk</span>
                                 </dt>
                                 <dd style="position: relative;">
-                                    <textarea v-model="msg" name="talk" id="txtTalk" class="fit" cols="30" rows="5" style="margin:0; border-radius: 8px;"></textarea>
+                                    <textarea v-model="msg" ref="textArea" name="talk" id="txtTalk" class="fit" cols="30" rows="5" @keyup.13.shift="sendMessage" @keyup.13.meta="sendMessage" ></textarea>
 
                                     <button class="btnSendMessage" type="button" @click="sendMessage">
                                         <i class="glyphicon glyphicon-send"></i>
@@ -80,9 +75,7 @@
                                     </button>
                                     {{ ava.name }}
                                 </dd>
-
                             </dl>
-
                         </form>
                         <div id="mdlEdit" class="modal fade">
                             <div class="modal-dialog modal-content">
@@ -157,11 +150,11 @@
                                 </div>
                             </div>
                         </div>
-                </fieldset>
+                    </div>
+                </div>
 
                 <!-- time line -->
                 <div id="main" v-if="showFlg" class="col-md-9 col-sm-8">
-                                           
                     <div class="screen">
                         <h1 id="room" class="mt0" v-bind:class="status">{{ roomName }}</h1>
 
@@ -173,7 +166,6 @@
                     </div>
                 </div>
 
-                </div>
             </div>
         </div>
     </div>

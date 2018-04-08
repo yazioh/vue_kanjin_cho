@@ -18,11 +18,11 @@ class apiAuth extends apiBase
             }
         } else {
             // SESSIONは切れてます
-            if (!empty($req["brkey"] && preg_match("/^[0-9a-f]{32}$/", $req["brkey"]))) {
+            if (!empty($req["brkey"]) && preg_match("/^[0-9a-f]{32}$/", $req["brkey"])) {
                 $row = $this->find($this->table, 'browser_key', $req["brkey"]);
                 if ($row && !empty($row['id'])) {
                     // token は再発行
-                    $_SESSION['brkey'] = striptags($req["brkey"]);
+                    $_SESSION['brkey'] = strip_tags($req["brkey"]);
                     $_SESSION['token'] = $this->mkPswd(16);
                     $this->saveToken();
 
