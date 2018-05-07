@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>きゃらとーく v2.0</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/kzc.css">
+</head>
+<body>
+    <div id="views" class="wrapper" :class="viewReady">
+        <div id="splash" v-if="views.Splash">        
+            <div class="koma">
+                    <p class="selif">
+                        <img src="img/spin_s.gif" alt="loading">
+                        <span>なうろ～でぃん </span>
+                    </p>
+                    <kzc-staff :name="'test'" />
+                </div>
+            </div>
+        </div>
+        <!-- views -->
+        <div id="timeline" v-if="vTimeline">        
+                <kzc-test :msg="'タイムライン予定地'"></kzc-test>
+            </div>
+
+        <div id="backlog" v-if="vBacklog">        
+            <kzc-test :msg="'なんとか！'"></kzc-test>
+        </div>
+        <!-- views -->
+        <div id="config" v-if="vConfig">       
+            <kzc-test :msg="'なんとか！'"></kzc-test>
+        </div>
+    </div>
+
+    <script src="js/v/jquery-3.3.1.min.js"></script>
+    <script src="js/v/bootstrap.min.js"></script>
+    <script src="js/v/store.legacy.min.js"></script>
+    <script src="js/v/vue.min.js"></script>
+
+    <script type="text/javascript" src="js/v2/avator.js"></script>
+    <script type="text/javascript" src="js/v2/app.js"></script>
+    <script>
+        var APP= APP||{}
+        $(function () {
+            console.log("jQuery startup");
+            APP.view = new Vue({
+                el: '#views',
+                data: {
+                    viewReady:false,
+                    views:{
+                        'Splash':true,
+                        'Timeline':false,
+                        'Backlog':false,
+                        'Config':true,
+                    },
+                    test:true,
+                },
+                computed: {
+                    vSplash:function( ){ return this.views["Splash"] },
+                    vTimeline:function( ){ return this.views["Timeline"] },
+                    vBacklog:function( ){ return this.views["Backlog"] },
+                    vConfig:function( ){ return this.views["Config"] },
+                    staff:function(){
+                    return "<a href='#'>!</a>"
+                }
+
+                },
+                methods: {},
+                mounted:function(){
+                    console.log("ready!")
+                    this.viewReady = true
+                },
+                
+            }); 
+        });
+    </script>
+</body>
+</html>
