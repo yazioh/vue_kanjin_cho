@@ -14,8 +14,9 @@ Vue.component(
             "img_hra",
             "img_hrf",
             "img_emf",
+            "bg_color",
         ],
-        template: '<div class="avator" :title="name">'
+        template: '<div class="avator" :title="name" :style="addStyle">'
         + '<span class="emo"   v-if="img_emb" :style="bgc(img_emb)"></span>'
         + '<span class="base"  v-if="img_bas" :style="bgc(img_bas)"></span>'
         + '<span class="hairB" v-if="img_hrb" :style="bgc(img_hrb)"></span>'
@@ -25,7 +26,7 @@ Vue.component(
         + '<span class="hairA" v-if="img_hra" :style="bgc(img_hra)"></span>'
         + '<span class="hairF" v-if="img_hrf" :style="bgc(img_hrf)"></span>'
         + '<span class="emo"   v-if="img_emf" :style="bgc(img_emf)"></span>'    
-        +'</div>',
+        +'{{ bg_color }}</div>',
         methods: {
             bgc:function(imgnm){
                 return "background-image:url("+imgnm+")";
@@ -45,7 +46,16 @@ Vue.component(
                 img_emf:this.img_emf,
             };
         },
-        computed: {},
+        computed: {
+            'addStyle':function(){
+                let css =[];
+                if(this.bg_color){
+                    css.push("back-ground-color:"+this.bg_color)
+                }
+                return css.join(";")
+            }
+
+        },
         mounted:function(){
             console.log("avator")
             console.log(this);
@@ -56,6 +66,7 @@ Vue.component(
  * アバター生成Util
  */
 class Avator {
+
     
     constructor(param) {
         this.name = "nanashi";
