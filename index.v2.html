@@ -6,12 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>きゃらとーく v2.0</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/kzc.css">
+    <link rel="stylesheet" href="css/v2/kzc.css">
 </head>
 <body>
     <div id="views" class="wrapper" :class="viewReady">
-        <div id="splash" v-if="views.Splash">        
-            <div class="koma">
+        <div id="splash" v-if="views.Splash" class="screen">        
+            <div>
+                <div class="koma">
                     <p class="selif">
                         <img src="img/spin_s.gif" alt="loading">
                         <span>なうろ～でぃん </span>
@@ -21,58 +22,113 @@
             </div>
         </div>
         <!-- views -->
-        <div id="timeline" v-if="vTimeline">        
+        <div id="alert" v-if="views.Alert" class="screen">        
+            <div class="locked">
+                <div class="koma">
+                    <p class="selif">
+                        <span class="glyphicon glyphicon-warning-sign"></span>
+                        <span>{{ alert.errorMSg }}</span>
+                    </p>
+                    <kzc-staff :name="'test'" />
+                </div>
+            </div>
+        </div>
+    
+        <div id="timeline" v-if="views.Timeline" class="screen">        
                 <kzc-test :msg="'タイムライン予定地'"></kzc-test>
             </div>
 
-        <div id="backlog" v-if="vBacklog">        
+        <div id="backlog" v-if="views.Backlog" class="screen">        
             <kzc-test :msg="'なんとか！'"></kzc-test>
         </div>
         <!-- views -->
-        <div id="config" v-if="vConfig">       
+        <div id="config" v-if="views.Config" class="screen">       
             <kzc-test :msg="'なんとか！'"></kzc-test>
         </div>
     </div>
 
     <script src="js/v/jquery-3.3.1.min.js"></script>
     <script src="js/v/bootstrap.min.js"></script>
-    <script src="js/v/store.legacy.min.js"></script>
+    <script src="js/v/store.modern.min.js"></script>
     <script src="js/v/vue.min.js"></script>
-
-    <script type="text/javascript" src="js/v2/avator.js"></script>
     <script type="text/javascript" src="js/v2/app.js"></script>
+    <script type="text/javascript" src="js/v2/api.js"></script>
+    <script type="text/javascript" src="js/v2/db.js"></script>
+    <script type="text/javascript" src="js/v2/avator.js"></script>
+
     <script>
         var APP= APP||{}
         $(function () {
+            // 起動の遅延
             console.log("jQuery startup");
+
             APP.view = new Vue({
                 el: '#views',
                 data: {
                     viewReady:false,
                     views:{
                         'Splash':true,
+                        'Alert':false,
                         'Timeline':false,
                         'Backlog':false,
                         'Config':true,
                     },
+                    alert:{errorMSg:"なにかのえらー"},
                     test:true,
                 },
-                computed: {
-                    vSplash:function( ){ return this.views["Splash"] },
-                    vTimeline:function( ){ return this.views["Timeline"] },
-                    vBacklog:function( ){ return this.views["Backlog"] },
-                    vConfig:function( ){ return this.views["Config"] },
-                    staff:function(){
-                    return "<a href='#'>!</a>"
-                }
 
+                computed: {
                 },
-                methods: {},
+
+                methods: {
+                    _switchView: function (newView ){
+                        $.each(this.views, (ix, o)=>{
+                            this.views[ix] = false
+                        })
+                        this.views[newView] =true
+                    },
+                    // 待受
+                    appStrat: function(){
+                        return new Promise((resolve,reject)=>{
+
+                            this.viewReady = true
+                            resolve()
+                        })
+                    },
+                    //異常終了
+                    appEnd: function(txt){
+                        console.log(txt)
+                        txt =(!txt)?"何か問題が発生しました" : txt 
+                        console.log("app error :"+ txt)
+                        this.alert.errorMSg = txt
+                        this._switchView("Alert")
+                    }
+                },
                 mounted:function(){
                     console.log("ready!")
-                    this.viewReady = true
+                    this._switchView("Splash")
+                    if(!APP.DB ){
+                        return this.appEnd()
+                    }
+                    
+                    $.when(
+                        APP.DB.ready,
+                        APP.API.ready
+                    ).then(()=>{
+                        console.log("util ready ")
+                        this.appStrat().then(()=>{
+                            console.log("welcome to きゃらと ver:"+APP.version )
+                            this._switchView("Timeline")
+                        })
+                    },
+                    //  失敗時
+                    this.appEnd)
+                    .catch((err)=>{
+                        console.log("boot canceled ...")
+                        console.log(err)
+                    })
+
                 },
-                
             }); 
         });
     </script>

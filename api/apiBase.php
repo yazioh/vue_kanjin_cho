@@ -114,7 +114,8 @@ class appBase
         $this->query("select id from m_user where browser_key={$brkey} and status='o'");
         if ($this->counts()) {
             $id = $this->q($this->fetchRow()["id"]);
-          //  $this->db->query("UPDATE m_user set( browser_key={$brkey}, session_key={$sess}, token={$token}) where id={};");
+            $this->db->query("UPDATE m_user set( browser_key={$brkey}, session_key={$sess}, token={$token}) where id={$id};");
+            $this->db->query("UPDATE m_user set( status ='x') where id<>{$id} AND browser_key={$brkey};");
         } else {
             $this->db->query("INSERT m_user values(0, {$brkey}, {$sess},{$token},'o',now(),now())");
         }

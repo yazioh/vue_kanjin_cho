@@ -3,6 +3,37 @@
  */
 Vue.component(
     "kzc-avator", {
+        // 画像レイヤー
+        components:{
+            aImg: {
+                template: '<span class="emo"  v-if="src" :style="myStyle"></span>',
+                props: ["src","z"],
+                computed:{
+                    myStyle: function(){
+                        return {
+                            "z-index": (this.z || 1),
+                            "background-image": "url("+this.src+")"
+                        };
+                    } 
+                }
+            }
+
+        },
+        // アバター全体　レイヤーの表示順調整
+        template: `
+<div class="avator" :title="name" :style="boxStyle">
+    <aImg class="emo"   :src="img_emb" :z=1 />
+    <aImg class="base"  :src="img_bas" :z=1 />
+    <aImg class="hairB" :src="img_hrb" :z=1 />
+    <aImg class="cloth" :src="img_clt" :z=1 />
+    <aImg class="eye  " :src="img_fca" :z=1 />
+    <aImg class="eye"   :src="img_eye" :z=1 />
+    <aImg class="hairA" :src="img_hra" :z=1 />
+    <aImg class="hairF" :src="img_hrf" :z=1 />
+    <aImg class="emo"   :src="img_emf" :z=1 />
+{{ bg_color }}</div>
+        `,
+
         props: [
             "name",
             "img_emb",
@@ -14,51 +45,30 @@ Vue.component(
             "img_hra",
             "img_hrf",
             "img_emf",
+
             "bg_color",
+            "rotate",
+            "reverce",
         ],
-        template: '<div class="avator" :title="name" :style="addStyle">'
-        + '<span class="emo"   v-if="img_emb" :style="bgc(img_emb)"></span>'
-        + '<span class="base"  v-if="img_bas" :style="bgc(img_bas)"></span>'
-        + '<span class="hairB" v-if="img_hrb" :style="bgc(img_hrb)"></span>'
-        + '<span class="cloth" v-if="img_clt" :style="bgc(img_clt)"></span>'
-        + '<span class="eye  " v-if="img_fca" :style="bgc(img_fca)"></span>'
-        + '<span class="eye"   v-if="img_eye" :style="bgc(img_eye)"></span>'
-        + '<span class="hairA" v-if="img_hra" :style="bgc(img_hra)"></span>'
-        + '<span class="hairF" v-if="img_hrf" :style="bgc(img_hrf)"></span>'
-        + '<span class="emo"   v-if="img_emf" :style="bgc(img_emf)"></span>'    
-        +'{{ bg_color }}</div>',
-        methods: {
-            bgc:function(imgnm){
-                return "background-image:url("+imgnm+")";
-            }
-        },
-        data:function() {
-            return {
-                name   :this.name   ,
-                img_emb:this.img_emb,
-                img_bas:this.img_bas,
-                img_hrb:this.img_hrb,
-                img_clt:this.img_clt,
-                img_fca:this.img_fca,
-                img_eye:this.img_eye,
-                img_hra:this.img_hra,
-                img_hrf:this.img_hrf,
-                img_emf:this.img_emf,
-            };
-        },
         computed: {
-            'addStyle':function(){
+            'boxStyle':function(){
                 let css =[];
                 if(this.bg_color){
                     css.push("back-ground-color:"+this.bg_color)
                 }
-                return css.join(";")
+                return css
             }
 
         },
+        data:function() {
+            return {
+                
+            };
+        },
+        methods: {
+        },
         mounted:function(){
-            console.log("avator")
-            console.log(this);
+           // console.log("avator")
         },
     });
 
@@ -66,7 +76,6 @@ Vue.component(
  * アバター生成Util
  */
 class Avator {
-
     
     constructor(param) {
         this.name = "nanashi";

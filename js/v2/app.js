@@ -1,6 +1,22 @@
 var APP = APP || {}
-APP.version = '2.00.00'
+APP.version = '2.00.00';
+//---
 (function(Vue){
+   $.extend( APP,{
+    ready : 0,
+    getAPI:function (){
+        return APP.API
+    },
+    getDB:function (){
+        return APP.DB
+    },
+    show: (viewName) =>{
+        if(!APP.view){
+            return
+        }
+        APP.view._switchView(viewName)
+    },
+   })
 
     Vue.component(
         "kzc-test", {
@@ -14,6 +30,7 @@ APP.version = '2.00.00'
             },
         });
        
+        
     /**
      * 汎用 Staff
      */
@@ -35,9 +52,9 @@ APP.version = '2.00.00'
             }
         },
         mounted:function(){
-            console.log("staff")
-            console.log(this);
+            // console.log("staff")
+            // console.log(this);
         },
      })
        
-})(Vue)
+})(Vue);
