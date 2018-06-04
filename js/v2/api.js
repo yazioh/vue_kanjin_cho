@@ -8,6 +8,7 @@ var APP = APP || {};
             this.timer = null;
             this.brkey='',
             this.sessionToken='',
+            this.chid='',
             this.ready = new Promise(function(resolve, reject){
                 console.log("API ready")
                 resolve()
@@ -40,17 +41,19 @@ var APP = APP || {};
             });
         }
     
-        static getChid() {
+        getChid() {
             return $.ajax({
                 url: this.apiUrl("avator"),
                 data: {
                     cmd: "cid",
+                    brkey: this.brkey,
                 },
                 dataType: "json"
             });
         }
     
-        static getAvator(chid) {
+        getAvator(chid) {
+            console.log(chid)
             return $.ajax({
                 url: this.apiUrl("avator"),
                 data: {
@@ -62,7 +65,7 @@ var APP = APP || {};
             });
         }
     
-        static setAvator(chid, upAvator) {
+        setAvator(chid, upAvator) {
             let data = upAvator.toJson();
             data.cmd = 'set';
             data.chid = chid;
@@ -79,6 +82,9 @@ var APP = APP || {};
         }
         setToken( token ){
             this.sessionToken = token
+        }
+        setChid( chid ){
+            this.chid = chid
         }
     
         /**
@@ -103,6 +109,8 @@ var APP = APP || {};
         getTalk(tkid) {
             let data = {
                 'cmd': "get",
+                'brkey': this.brkey,
+                'token': this.sessionToken ,
             };
             if (tkid) {
                 data.tkid = tkid;
@@ -115,6 +123,24 @@ var APP = APP || {};
             });
         }
     
+        /**
+         * getRoomInfo
+         */
+        getRoominfo(id){
+            return new Promise((resolve, reject)=>{
+                setTimeout(() => {
+                    resolve({
+                        status:'o',
+                        roomInfo: {
+                            id: 1,
+                            name: "ひだまりの放課後",
+                            lastAccess: new Date("2018/03/27 12:15:31")
+                        }
+                    })
+                }, 1*sec);
+            })
+        }
+
         // test
         static get(url, okTask, errorTask) {
             var request = new XMLHttpRequest();

@@ -35,8 +35,9 @@
         </div>
     
         <div id="timeline" v-if="views.Timeline" class="screen">        
-                <kzc-test :msg="'タイムライン予定地'"></kzc-test>
-            </div>
+            <time-line ref="Timeline" :msg="'タイムライン予定地'"><kzc-staff name="test" /></kzc-test>
+            
+        </div>
 
         <div id="backlog" v-if="views.Backlog" class="screen">        
             <kzc-test :msg="'なんとか！'"></kzc-test>
@@ -52,16 +53,19 @@
     <script src="js/v/store.modern.min.js"></script>
     <script src="js/v/vue.min.js"></script>
     <script type="text/javascript" src="js/v2/app.js"></script>
+    <script type="text/javascript" src="js/v2/cmp-time-line.js"></script>
+
+
+
     <script type="text/javascript" src="js/v2/api.js"></script>
-    <script type="text/javascript" src="js/v2/db.js"></script>
     <script type="text/javascript" src="js/v2/avator.js"></script>
+    <script type="text/javascript" src="js/v2/db.js"></script>
 
     <script>
         var APP= APP||{}
         $(function () {
             // 起動の遅延
             console.log("jQuery startup");
-
             APP.view = new Vue({
                 el: '#views',
                 data: {
@@ -76,15 +80,22 @@
                     alert:{errorMSg:"なにかのえらー"},
                     test:true,
                 },
-
                 computed: {
                 },
 
                 methods: {
                     _switchView: function (newView ){
-                        $.each(this.views, (ix, o)=>{
+                        $.each(this.views, (ix, vw)=>{
                             this.views[ix] = false
+                            if(this.$refs && this.$refs[ix] && this.$refs[ix].hide  ){
+                                this.$refs[ix].hide();
+                            }
                         })
+
+                        if(this.$refs[newView] && this.$refs[newView].restart ){
+                            // 最初のとき mount されてないので ２度めのときにしか。。。
+                            this.$refs[newView].restart();
+                        }
                         this.views[newView] =true
                     },
                     // 待受
@@ -106,14 +117,16 @@
                 },
                 mounted:function(){
                     console.log("ready!")
+                    this.viewReady = true;
+                    ///                    
                     this._switchView("Splash")
-                    if(!APP.DB ){
+                    if(!APP.getDB() ){
                         return this.appEnd()
                     }
                     
                     $.when(
-                        APP.DB.ready,
-                        APP.API.ready
+                        APP.getDB().ready,
+                        APP.getAPI().ready
                     ).then(()=>{
                         console.log("util ready ")
                         this.appStrat().then(()=>{

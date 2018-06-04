@@ -1,22 +1,33 @@
-var APP = APP || {}
-APP.version = '2.00.00';
+var APP = APP || {};
 //---
 (function(Vue){
-   $.extend( APP,{
-    ready : 0,
-    getAPI:function (){
-        return APP.API
-    },
-    getDB:function (){
-        return APP.DB
-    },
-    show: (viewName) =>{
-        if(!APP.view){
-            return
+    $.extend( APP,{
+        version : '2.00.00',
+        ready : 0,
+
+        getAPI:function (){
+            return APP.API
+        },
+        getDB:function (){
+            return APP.DB
+        },
+        getAvator:function (){
+            return new Avator()
+        },
+
+        show: (viewName) =>{
+            if(!APP.view){
+                return
+            }
+            APP.view._switchView(viewName)
+        },
+
+        roomInfo : {"id":'', "name":'', "update":''},
+        setCurRoom: function( newRoomInfo ){
+            $.extend( this.roomInfo, newRoomInfo) 
         }
-        APP.view._switchView(viewName)
-    },
-   })
+        
+    });
 
     Vue.component(
         "kzc-test", {

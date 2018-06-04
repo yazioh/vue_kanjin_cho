@@ -1,26 +1,27 @@
+var APP = APP || {}
+
 /**
  * アバター表示基本コンポーネント
  */
-Vue.component(
-    "kzc-avator", {
-        // 画像レイヤー
-        components:{
-            aImg: {
-                template: '<span class="emo"  v-if="src" :style="myStyle"></span>',
-                props: ["src","z"],
-                computed:{
-                    myStyle: function(){
-                        return {
-                            "z-index": (this.z || 1),
-                            "background-image": "url("+this.src+")"
-                        };
-                    } 
-                }
+Vue.component( "kzc-avator", {
+    // 画像レイヤー
+    components:{
+        aImg: {
+            template: '<span class="emo"  v-if="src" :style="myStyle"></span>',
+            props: ["src","z"],
+            computed:{
+                myStyle: function(){
+                    return {
+                        "z-index": (this.z || 1),
+                        "background-image": "url("+this.src+")"
+                    };
+                } 
             }
+        }
 
-        },
-        // アバター全体　レイヤーの表示順調整
-        template: `
+    },
+    // アバター全体　レイヤーの表示順調整
+    template: `
 <div class="avator" :title="name" :style="boxStyle">
     <aImg class="emo"   :src="img_emb" :z=1 />
     <aImg class="base"  :src="img_bas" :z=1 />
@@ -32,45 +33,46 @@ Vue.component(
     <aImg class="hairF" :src="img_hrf" :z=1 />
     <aImg class="emo"   :src="img_emf" :z=1 />
 {{ bg_color }}</div>
-        `,
+    `,
 
-        props: [
-            "name",
-            "img_emb",
-            "img_bas",
-            "img_hrb",
-            "img_clt",
-            "img_fca",
-            "img_eye",
-            "img_hra",
-            "img_hrf",
-            "img_emf",
+    props: [
+        "name",
+        "img_emb",
+        "img_bas",
+        "img_hrb",
+        "img_clt",
+        "img_fca",
+        "img_eye",
+        "img_hra",
+        "img_hrf",
+        "img_emf",
 
-            "bg_color",
-            "rotate",
-            "reverce",
-        ],
-        computed: {
-            'boxStyle':function(){
-                let css =[];
-                if(this.bg_color){
-                    css.push("back-ground-color:"+this.bg_color)
-                }
-                return css
+        "bg_color",
+        "rotate",
+        "reverce",
+    ],
+    computed: {
+        'boxStyle':function(){
+            let css =[];
+            if(this.bg_color){
+                css.push("back-ground-color:"+this.bg_color)
             }
+            return css
+        }
 
-        },
-        data:function() {
-            return {
-                
-            };
-        },
-        methods: {
-        },
-        mounted:function(){
-           // console.log("avator")
-        },
-    });
+    },
+    data:function() {
+        return {
+            
+        };
+    },
+    methods: {
+    },
+    mounted:function(){
+    // console.log("avator")
+    },
+});
+
 
 /**
  * アバター生成Util
@@ -325,7 +327,7 @@ class Avator {
      * @param {*} gender 
      */
     static getItems(partName, gender) {
-        let parts = DB.getAvatorParts(partName);
+        let parts = APP.getDB().getAvatorParts(partName);
         if (typeof parts[gender] !== "undefined") {
             return parts[gender];
         }
@@ -341,14 +343,14 @@ class Avator {
      * @param {*} g 性別 
      */
     static getDefault(g) {
-        return DB.defaultAvator(((g == 'M') ? 'M' : 'F'));
+        return APP.getDB().defaultAvator(((g == 'M') ? 'M' : 'F'));
     }
 
     /**
      * @param {*} partName 
      */
     static emotionItems(partName, gender) {
-        return DB.emotionItems(partName, gender);
+        return APP.getDB().emotionItems(partName, gender);
     }
 
     /**
@@ -361,3 +363,5 @@ class Avator {
     }
 
 }
+
+

@@ -117,29 +117,16 @@ class apiAvator extends apiBase
                 ));
                 exit;
             }
+            // chidh発行後 br
       
-            $qBrkey = $this->q($brkey);
-            $sql = "INSERT " . $this->table . " VALUES(0, {$qBrkey},'','','','o', now(), now())";
-            $this->query($sql);
-            if ($this->dbError()) {
-                throw new exception($this->dbError());
-            }
-
-            $id = $this->db->insert_id;
-            $chid= sprintf("%s%05d", $this->mkPswd(2), $id);
-            
-            $qChid = $this->q($chid); 
-            $sql = "UPDATE " . $this->table . " set chid={$qChid} where id={$id}";
-            $this->query($sql);
-            if ($this->dbError()) {
-                throw new exception($this->dbError());
-            }
-
+            // キャラクター枠の新設
+            $id = $this->_createCharactor($brkey);
+            $chid= $this->_setChid( $id );
             $this->showJson(array(
                 "status" => 'o',
                 "chid" => $chid,
             ));
-            
+
 
         } catch (Exception $ex) {
             $this->showJson(array(
@@ -147,8 +134,32 @@ class apiAvator extends apiBase
                 "msg" => $ex->getMessage(),
             ));
         }
-
     }
+
+    protected function _createCharactor($brkey ){
+        $qBrkey = $this->q($brkey);
+
+        $sql = "INSERT " . $this->table . " VALUES(0, {$qBrkey},'','','','o', now(), now())";
+        $this->query($sql);
+        if ($this->dbError()) {
+            throw new exception($this->dbError());
+        }
+        return $this->db->insert_id;
+    }
+
+    protected function _setChid( $id ){
+        $chid= sprintf("%s%05d", $this->mkPswd(2), $id);
+        $qChid = $this->q($chid); 
+
+        $sql = "UPDATE " . $this->table . " set chid={$qChid} where id={$id}";
+        $this->query($sql);
+        if ($this->dbError()) {
+            throw new exception($this->dbError());
+        }
+        return $chid;
+    }
+
+
 }
 
 $app = new apiAvator();
