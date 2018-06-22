@@ -15,7 +15,6 @@ var APP = APP || {};
             })
         }
 
-        
         apiUrl(apiName) {
             //todo 
             return "./api/" + apiName + ".php";
@@ -41,6 +40,12 @@ var APP = APP || {};
             });
         }
     
+        /**
+         * 現在の browserキーに紐づくキャラクター番号を取得
+         * 
+         * なければサーバー側で新作してくれるので
+         * エラーになるのは,brkey不正のときか通信不良
+         */
         getChid() {
             return $.ajax({
                 url: this.apiUrl("avator"),

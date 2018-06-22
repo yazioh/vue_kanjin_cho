@@ -97,58 +97,74 @@
             })
         },
 
+        // 現在ユーザーのアバター復元
         getCurAvator:function(){
-            console.log('getCurAvator')
-            
+            var chid = DB._getLS("chid")
+            const Avator = APP.getAvator()
+        
             return new Promise((resolve, reject)=>{
-                var chid = DB._getLS("chid")
-                API.getChid()
-                    .then((res)=>{
+                console.log('start getCurAvator')
 
-                        if(!res || !res.status){
-                            reject ("getCurAvator service not found")
-                        }
-                        if(res.chid!= chid){
-                            chid = res.chid
-                            console.log(DB)
-                            DB._setLS("chid", chid)
-                        } 
-                        API.setChid(chid)
-                   }).then(()=>{
-
-                    let AC = DB._getLS("avator_cache")
-                    DB.aCache = (AC)? AC: {}
-
-                    if(!DB.aCache[chid]){
-                        const Avator = APP.getAvator()
-                        Avator.setName("未設定")
-                        DB.aCache[chid] = Avator.toJson()
+                API.getChid().then((res)=>{
+                    if(!res || !res.status){
+                        reject ("getCurAvator service not found")
                     }
-                    if(!DB.aCache.staff){
-                        DB.aCache.staff = APP.getStaff()
-                    }
-                    console.log('getCurAvator end')
-                }).then(()=>{
-                    let chid = DB._getLS("chid")
+
+                    // サーバーから chid 変更指定(新規or切り替え)
+                    if(res.chid!= chid){
+                        chid = res.chid
+                        DB._setLS("chid", chid)
+                    } 
+                    //各画面で共通利用する
+                    APP.setPlayer({ chid: chid})
+
+                    _initAvacache()
+                    API.setChid(chid)
                     API.getAvator(chid).then((res)=>{
-                        if(res && res.status){
-                            if(res.data.name !=='' || res.data.face){
-                                console.log("skip")
-                                // skip
-                                return
-                            }
-                            // サーバーにもPushしといて
-                            console.log("push")
-                            API.setAvator(chid, APP.getAvator(DB.aCache[chid])).then(()=>{
-                                console.log("pushed")
-                            })
+                        if(!res && !res.status || res.status=='x'){
+                            reject("API.getAvator NG")
+                        }
+                        if(res.data.name !=='' || res.data.face){
+                            _loadFromServer(res);
                         }
                     })
-
+                    let player = {
+                        "chid": chid,
+                        "face":DB.aCache[chid]
+                    }
+                    APP.setPlayer(player)
+                    resolve(player)
                 })
-                .then(resolve,reject)
-
             })
+
+            // private Func
+            function _initAvacache(){
+                let AC = DB._getLS("avator_cache")
+                DB.aCache = (AC)? AC: {}
+                if(!DB.aCache[chid]){
+                    Avator.setName("未設定")
+                    DB.aCache[chid] = Avator.toJson()
+                }
+                if(!DB.aCache.staff){
+                    DB.aCache.staff = APP.getStaff()
+                }
+                console.log('avator_cache ready')
+            }
+            
+            function _loadFromServer(res){
+                // TODO 更新時刻比較で新しい方
+                // 将来 chid 共有することもあるかも
+                Avator.load(res.data.face)
+                DB.aCache[chid] = Avator.toJson()
+            }
+            function _pushCurrAvatar(){
+                // サーバーにもPushしといて
+                console.log("push")
+                API.setAvator(chid, DB.aCache[chid])
+                .then(()=>{
+                    console.log("pushed")
+                })
+            }
         },
 
         getCurRoom(rn){
@@ -165,8 +181,8 @@
                     }
                     DB._setLS("last_room", res.roomInfo)
                     APP.setCurRoom(res.roomInfo)
-
                     console.log('getCurRoom end')
+
                 }).then(resolve,reject)
             })
         },
@@ -179,7 +195,6 @@
             //未指定は false
             backFlg = backFlg || false
 
-
             // cuurNo 指定されてない場合 last befoe 10 に
             if(!cuurNo){
                 cuurNo = 999999
@@ -190,7 +205,7 @@
 
             var cnt = 0
             let res = talks.filter((row,ix,arr)=>{
-                if (cnt>limit) return false
+                if (cnt>limit) return fals
                 if(backFlg){
                     return ( row.logNo <= cuurNo )
                 }
@@ -202,18 +217,25 @@
         _mergeTalkLog( roomNo, res){
 
         },
-        
+
+        __lsLogName:function (roomID){
+            return "talk_log"
+            // 要 切り替え
+            // return "talk_log_"+roomID
+        },
 
         // LS からログを抽出
         _lsLog: function(roomID, rev){
             rev = rev || false
-            if( !tCache || !tCache[roomID]){
-                let lgAry = DB._getLS("talk_log_"+roomID)
-                tCache[roomID] = (lgAry)? lgAry:[]
+            if( !DB.tCache || !DB.tCache[roomID]){
+
+                let lgAry = DB._getLS(DB.__lsLogName())
+                DB.tCache[roomID] = (lgAry)? lgAry:[]
+                //
             }
 
             // LS上は時系列に並んでるものとする
-            let talks = tCache[roomID]
+            let talks = DB.tCache[roomID]
             // reverce 指定があったらソート
             if(rev){
                 talks.sort((A,B)=>{
@@ -222,7 +244,42 @@
             }
             return talks
         },
+        //-----------------------------------------
+        // Time Line からの要求
+        //-----------------------------------------
+        getCid(){
+            // 起動後なら絶対にある
+            return DB._getLS("chid")
+        },
+        getAvator( cid ){
+            return new Promise((resolve, reject) => {
+                if(!cid){reject()}
+                if(DB.aCache[cid]){
+                    console.log('cache hit')
+                    return resolve(DB.aCache[cid]); 
+                }
 
+                API.getAvator(cid).then((res)=>{
+                    if(!res.status || res.status =='x'){
+                        return fail(res)
+                    }
+                    DB.updateAvaCache(cid,  res.data)
+                    DB.updateAvaCache()
+                    resolve(DB.aCache[cid]);
+
+                }, fail)
+                // 通信失敗
+                function fail(res){
+                    DB.updateAvaCache(cid, new Avator().toJson())
+                    console.log("ava request err:"+ cid)
+                }
+            })
+        },
+        // 1体更新 → LSも
+        updateAvaCache:function(cid,chrJson){
+            DB.aCache[cid] = chrJson
+            DB._setLS('avator_cache', DB.aCache)
+        },
         //-----------------------------------------
         // raw data section        
         //-----------------------------------------

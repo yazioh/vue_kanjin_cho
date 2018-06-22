@@ -50,6 +50,7 @@ Vue.component( "kzc-avator", {
         "bg_color",
         "rotate",
         "reverce",
+        "zoom",
     ],
     computed: {
         'boxStyle':function(){
@@ -57,6 +58,7 @@ Vue.component( "kzc-avator", {
             if(this.bg_color){
                 css.push("back-ground-color:"+this.bg_color)
             }
+            // TODO this.zoom/reverce/rotate
             return css
         }
 
@@ -275,43 +277,37 @@ class Avator {
      */
     static build(face) {
         let urlEmoBg = "";
-        let urlFace = this.urlFace(face);
-        let urlEye = this.urlEye(face);
-
-        let urlHairB = this.urlHairB(face);
-        let urlHairA = this.urlHairA(face);
-        let urlHairF = this.urlHairF(face);
-
-        let urlFaceA = this.urlFaceA(face);
-        let urlCloth = this.urlCloth(face);
-        let urlEmoFr = this.urlEmoFr(face);
-
-        let vw =
-            (urlEmoBg ? `<span class="emo"   style="background-image:url(${urlEmoBg})"></span>` : '') +
-            (urlFace ? `<span class="base"   style="background-image:url(${urlFace} )"></span>` : '') +
-            (urlHairB ? `<span class="hairB" style="background-image:url(${urlHairB})"></span>` : '') +
-            (urlCloth ? `<span class="cloth" style="background-image:url(${urlCloth})"></span>` : '') +
-            (urlFaceA ? `<span class="eye"   style="background-image:url(${urlFaceA})"></span>` : '') +
-            (urlEye ? `<span class="eye  "   style="background-image:url(${urlEye}  )"></span>` : '') +
-            (urlHairA ? `<span class="hairA" style="background-image:url(${urlHairA})"></span>` : '') +
-            (urlHairF ? `<span class="hairF" style="background-image:url(${urlHairF})"></span>` : '') +
-            (urlEmoFr ? `<span class="emo"   style="background-image:url(${urlEmoFr})"></span>` : '');
-        return vw;
+        return {
+            "name":'',
+            "img_emb":'',
+            "img_bas": this.urlFace(face),
+            "img_hrb": this.urlHairB(face),
+            "img_clt": this.urlCloth(face),
+            "img_fca": this.urlFaceA(face),
+            "img_eye": this.urlEye(face),
+            "img_hra": this.urlHairA(face),
+            "img_hrf": this.urlHairF(face),
+            "img_emf": this.urlEmoFr(face),
+    
+            "bg_color":'',
+            "rotate":'',
+            "reverce":'',
+        }   
     }
 
-    /**
-     * Koma からの呼び出し用
-     * chid のキャラクターに emotion 表情を適用して返す
-     */
-    static show(chid, emotion) {
-        if (this.cacheExists(chid)) {
-            // キャラクターとしての既定値
-            let _ava = this.getCache(chid);
-            // 動的に差し替えできるパーツ 単純コピーだと発火イベントがループするらしい？
-            _ava.face.emo = Vue.util.extend({}, emotion);
-            return this.build(_ava.face);
-        }
-    }
+    // /**
+    //  * Koma からの呼び出し用
+    //  * chid のキャラクターに emotion 表情を適用して返す
+    //  */
+    // static show(chid, emotion) {
+    //     if (this.cacheExists(chid)) {
+    //         // キャラクターとしての既定値
+    //         let _ava = this.getCache(chid);
+    //         // 動的に差し替えできるパーツ 単純コピーだと発火イベントがループするらしい？
+    //         _ava.face.emo = Vue.util.extend({}, emotion);
+    //         return this.build(_ava.face);
+    //     }
+    // }
     
     static getName(chid) {
         if (!this.cacheExists(chid)) {

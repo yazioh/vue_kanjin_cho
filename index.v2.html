@@ -35,8 +35,9 @@
         </div>
     
         <div id="timeline" v-if="views.Timeline" class="screen">        
-            <time-line ref="Timeline" :msg="'タイムライン予定地'"><kzc-staff name="test" /></kzc-test>
-            
+            <time-line ref="Timeline"
+                :msg="'タイムライン予定地'"
+            ></kzc-test>
         </div>
 
         <div id="backlog" v-if="views.Backlog" class="screen">        
@@ -54,8 +55,7 @@
     <script src="js/v/vue.min.js"></script>
     <script type="text/javascript" src="js/v2/app.js"></script>
     <script type="text/javascript" src="js/v2/cmp-time-line.js"></script>
-
-
+    <script type="text/javascript" src="js/v2/kzc-koma.js"></script>
 
     <script type="text/javascript" src="js/v2/api.js"></script>
     <script type="text/javascript" src="js/v2/avator.js"></script>

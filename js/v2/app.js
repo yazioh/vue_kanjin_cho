@@ -19,14 +19,32 @@ var APP = APP || {};
             if(!APP.view){
                 return
             }
+            if(viewName==='AvatorEdit'){
+                // show modal ?
+            }
             APP.view._switchView(viewName)
         },
 
-        roomInfo : {"id":'', "name":'', "update":''},
+        roomInfo : {
+            "id":'',
+            "name":'',
+            "status":'',
+            "update":''
+        },
         setCurRoom: function( newRoomInfo ){
-            $.extend( this.roomInfo, newRoomInfo) 
+            $.extend( this.roomInfo, newRoomInfo)
+            this.roomInfo.update = new Date()
+        },
+
+        player:{
+            "chid": '',
+            "face": {},
+            "update":''
+        },
+        setPlayer:function(newPlayer){
+            $.extend( this.player, newPlayer) 
+            this.player.update = new Date()
         }
-        
     });
 
     Vue.component(
@@ -36,7 +54,6 @@ var APP = APP || {};
             methods: {},
             computed: { },
             mounted:function(){
-                console.log("test!")
     
             },
         });
