@@ -15,29 +15,30 @@ var APP = APP || {};
     //----------------------------------------------------
     Vue.component("time-line", {
         template: `
-<div>
-  <div class="row">
-    <div class="col-sm-2">
-        <cmp-room-info v-bind="roomInfo"/>
-    </div>
-    <div class="col-sm-8 col-md-6">
-    <div class="page">
-        <slot /> 
-        <ol class="timeline row">
-            <kzc-koma  v-for="talk in curPageLog" :talk="talk" >{{talk}}</kzc-koma>
-        </ol>
+<div class="container-fluid no-gutters" style="height:100%; over-flow:hidden">
+    <div class="row" style="height:100%; over-flow:hidden">
+
+        <div class="col-sm-8 col-lg-9 col-xl-8 order-sm-last">
+            <div class="pageholder" style="height:100%; over-flow:auto"> 
+                <div class="page">
+                    <slot /> 
+                    <ol class="timeline">
+                        <kzc-koma  v-for="talk in curPageLog" :talk="talk" >{{talk}}</kzc-koma>
+                    </ol>
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="col-sm-4 col-lg-3 col-xl-2 order-sm-first" >
+            <div style="height:100%; over-flow:auto" >
+                <cmp-room-info v-bind="roomInfo"/>
+                <cmp-paginate ref="paginate" v-model="curPage" />
+                <cmp-talk-panel />
+            </div>
         </div>
+    
     </div>
-    <div class="col-sm-2">
-        aaaa    
-        <cmp-talk-panel :chid="chid"  />
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-12 text-center">
-        <cmp-paginate ref="paginate" v-model="curPage" />
-    </div>
-  </div>
     
 </div>`,
 
@@ -122,7 +123,7 @@ var APP = APP || {};
     //----------------------------------------------------
     Vue.component("cmp-talk-panel", {
         template:`<div>TK
-<form :id="_id" v-show="1">
+<form ref="talkform" v-show="1">
     <dl>
         <dt class="hidden-sm hidden-xs">
             <span>talk</span>
@@ -157,7 +158,7 @@ var APP = APP || {};
             </div>
         </dd>
     </dl>
-</dorm>
+</form>
         </div>`,
         components :{
             txtTalk: {

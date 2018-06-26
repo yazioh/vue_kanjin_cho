@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>きゃらとーく v2.0</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/fontawsome/css/fontawesome.css">
+    <link rel="stylesheet" href="css/bs4/bootstrap.min.css">
     <link rel="stylesheet" href="css/v2/kzc.css">
 </head>
 <body>
-    <div id="views" class="wrapper" :class="viewReady">
+    <div id="views"  ref="wrapper" class="wrapper" :class="viewReady">
         <div id="splash" v-if="views.Splash" class="screen">        
             <div>
                 <div class="koma">
@@ -50,7 +51,7 @@
     </div>
 
     <script src="js/v/jquery-3.3.1.min.js"></script>
-    <script src="js/v/bootstrap.min.js"></script>
+    <script src="js/bs4/bootstrap.min.js"></script>
     <script src="js/v/store.modern.min.js"></script>
     <script src="js/v/vue.min.js"></script>
     <script type="text/javascript" src="js/v2/app.js"></script>
@@ -116,6 +117,8 @@
                     }
                 },
                 mounted:function(){
+                    
+
                     console.log("ready!")
                     this.viewReady = true;
                     ///                    
