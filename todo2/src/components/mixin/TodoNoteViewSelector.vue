@@ -12,7 +12,7 @@ const STATUS = {
 } 
 
 export default {
-
+    tempplate: '<!-- ->',
     computed:{
         statusLabels:function(){
             return STATUS
@@ -26,7 +26,7 @@ export default {
     },
     methods: {
         viewActive:function(name,payload){
-            
+            console.log(name, payload)
         }
     },
     created: function(){
