@@ -8,6 +8,7 @@
         <TodoArea type="a2" :todo="tasksA2" @update="onUpdate"/>
       </b-col>
     </b-form-row>
+
     <b-form-row class="task-area task-slow">
       <b-col md="6" lg="8">
         <TodoArea type="a3" :todo="tasksA3" @update="onUpdate"/>
@@ -21,34 +22,30 @@
 <script>
 
 import TodoArea from '../elements/TodoArea'
+import Query from '../mixin/Query'
+
 export default {
 
   components:{
     TodoArea
   },
+  mixins:[Query],
   props:{
     "TODOs":{}
   },
   computed: {
+
     tasksA1:function(){
-      return this.TODOs.filter((todo)=>{
-          return(todo.area =='a1')
-      })
+      return this.queryTasksArea(this.TODOs, 'a1')
     },
     tasksA2:function(){
-      return this.TODOs.filter((todo)=>{
-          return(todo.area =='a2')
-      })
+      return this.queryTasksArea(this.TODOs, 'a2')
     },
     tasksA3:function(){
-      return this.TODOs.filter((todo)=>{
-          return(todo.area =='a3')
-      })
+      return this.queryTasksArea(this.TODOs, 'a3')
     },
     tasksA4:function(){
-      return this.TODOs.filter((todo)=>{
-          return(todo.area =='a4')
-      })
+      return this.queryTasksArea(this.TODOs, 'a4')
     },
 
   },
@@ -78,8 +75,8 @@ export default {
     height:100%;
     overflow: hidden;
   }
-  .task-area {
-    margin-top: 0.5rem;
+  .task-area > div {
+    padding-top: 0.5rem;
   }
   .task-area > *{
     height: 100%; 
@@ -93,6 +90,17 @@ export default {
   }
   .task-slow{
     height:40%;
+  }
+
+  /* SPは 縦積みに*/
+  .screen-sm .wapper{
+    height: auto;
+  }
+  .screen-sm .task-hurry{
+    height: auto;
+  }
+  .screen-sm .task-slow{
+    height: auto;
   }
 
 </style>

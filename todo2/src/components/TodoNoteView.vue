@@ -6,6 +6,7 @@
 <script>
 export default {
     props:{
+        lotate:{},
         show:{
             default: false
         }
@@ -15,8 +16,9 @@ export default {
 
 <style scoped>
 .todo-view {
+    margin: 0;
     position: relative;
-    width:100%; height:100%;
-    
+    width:100%; 
+    height:calc(100% - 10px);
 }
 </style>

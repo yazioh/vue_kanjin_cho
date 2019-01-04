@@ -12,7 +12,9 @@ export default class TASK {
 
   constructor (json = {}) {
     this.id = json.id || this.newID()
+    this.TodoID = json.TodoID || ''
     this.label = json.label || 'any task'
+    this.status = json.status || STATUS_YET
   }
 
   newID () {
@@ -26,7 +28,9 @@ export default class TASK {
   isDelete () {
     return (this.status === STATUS_DELETE)
   }
-
+  isGoing () {
+    return (this.status !== STATUS_DELETE)
+  }
   isChecked () {
     return (this.status === STATUS_DONE)
   }

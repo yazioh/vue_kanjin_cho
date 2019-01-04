@@ -16,6 +16,7 @@ export default class TODO {
     this.title = json.title || 'any todo'
     this.area = json.area || 'a4'
     this.unitTime = json.unitTime || 15
+    this.schedule = json.schedule || ''
     this.remarks = json.remarks || ''
     this.tasks = json.tasks || [new TASK({TodoID: this.id})]
     this.status = json.status || STATUS_OK
@@ -32,4 +33,46 @@ export default class TODO {
   isDelete () {
     return (this.status === STATUS_DELETE)
   }
+
+  isGoing () {
+    // console.log('sum', this.sumWorkTimeYet(), this.sumWorkTimeTotal())
+    return (this.status !== STATUS_DELETE)
+  }
+
+  sumWorkTimeTotal () {
+    let TASKs = this.getLiveTask()
+    return TASKs.length * this.unitTime // min
+  }
+
+  sumWorkTimeYet () {
+    let TASKs = this.getGoingTask()
+    return TASKs.length * this.unitTime // min
+  }
+
+  validTasks () {
+    if (!this.tasks || !this.tasks.filter) {
+      return []
+    }
+    return this.tasks
+  }
+
+  // TODO Queryに移せるんじゃ？
+  // 削除抜き
+  getLiveTask () {
+    return this.validTasks().filter((task) => {
+      return !task.isDelete()
+    })
+  }
+  // 未チェック
+  getGoingTask () {
+    return this.validTasks().filter((task) => {
+      return !task.isGoing()
+    })
+  }
+
+
+  sumWorkYet () {
+
+  }
+
 }

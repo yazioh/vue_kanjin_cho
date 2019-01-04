@@ -1,17 +1,19 @@
 <template>
   <div class="sticky">
-    <p class="title">{{ title }}</p>
-    <ul v-if="modePreview" class="todos">
+    <div>
+      <p class="title">{{ title }}</p>
+      <ul v-if="modePreview" class="todos">
 
-      <li v-for="task in TASKs" :key="task.id">
-        <b-form-checkbox 
-          v-model="task.status" 
-            value="v"
-            unchecked-value="_"
-          @change="onUpdate(task.id)"
-          >{{ task.label }} {{ task.id }}</b-form-checkbox>
-      </li>
-    </ul>    
+        <li v-for="task in TASKs" :key="task.id">
+          <b-form-checkbox 
+            v-model="task.status" 
+              value="v"
+              unchecked-value="_"
+            @change="onUpdate(task.id)"
+            >{{ task.label }} {{ task.id }}</b-form-checkbox>
+        </li>
+      </ul>    
+    </div>
   </div>
 </template>
 <script>
@@ -31,7 +33,6 @@ export default {
       if(!this.todo || !this.todo.tasks){
         return []
       }
-      console.log("v",this.todo.tasks)
       return this.todo.tasks
     },
     title: function(){
@@ -74,10 +75,13 @@ export default {
 </script>
 <style>
 
-  .fusen {
+  .sticky {
     background-color: rgba(255,255,255,0.5);
     box-shadow:1px 1px 0 rgba(0,0,0,0.25); 
     margin:0 0.25rem 0.5rem;
+  }
+  .sticky > div {
+    padding: 0.5rem;
   }
 
 </style>
